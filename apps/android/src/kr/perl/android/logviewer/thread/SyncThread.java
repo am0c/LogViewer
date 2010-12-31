@@ -50,6 +50,13 @@ public class SyncThread extends Thread {
 	
 	@Override
 	public void run() {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		HttpResponse res = null;
 		try {
 			res = HttpHelper.query(mUri);
