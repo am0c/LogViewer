@@ -47,11 +47,7 @@ public class ViewerActivity extends ListActivity {
 		setProgressBarIndeterminateVisibility(true);
 		init();
 		addHooks();
-		new Handler().postDelayed(new Runnable() {
-			public void run() {
-				refresh();
-			}
-		}, 100);
+		refresh();
 	}
 	
 	private void sync(final Uri uri, final String channel) {
