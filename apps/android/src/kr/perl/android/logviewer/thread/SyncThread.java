@@ -28,11 +28,10 @@ import android.widget.Toast;
 public class SyncThread extends Thread {
 	
 	private ListActivity mActivity;
-	private Handler mHandler;
 	private Uri mUri;
 	private String mChannel;
 	
-	private Runnable setEmptyContentRunnable = new Runnable() {
+	private Runnable threadEmptyContentRunnable = new Runnable() {
 		public void run() {
 			mActivity.setProgressBarIndeterminateVisibility(false);
 			if (mActivity.getListAdapter().getCount() == 0) {
@@ -41,15 +40,38 @@ public class SyncThread extends Thread {
 		}
 	};
 	
+	private Runnable threadLoadingBarStart = new Runnable() {
+		@Override
+		public void run() {
+			mActivity.setProgressBarIndeterminate(true);
+		}
+	};
+
+	private Runnable threadLoadingBarStop = new Runnable() {
+		@Override
+		public void run() {
+			mActivity.setProgressBarIndeterminate(false);
+		}
+	};
+		
 	public SyncThread(ListActivity activity, Uri uri, String channel) {
 		mActivity = activity;
-		mHandler = new Handler();
 		mUri = uri;
 		mChannel = channel;
 	}
 	
 	@Override
 	public void run() {
+		try {
+			mActivity.runOnUiThread(threadLoadingBarStart);
+			runSync();
+			mActivity.runOnUiThread(threadLoadingBarStop);
+		} catch (Exception e) {
+			mActivity.runOnUiThread(threadLoadingBarStop);
+		}
+	}
+	
+	private void runSync() {
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e1) {
@@ -66,13 +88,13 @@ public class SyncThread extends Thread {
 		
 		if (res == null) {
 			ContextUtil.toast(mActivity, mActivity.getApplicationContext().getString(R.string.error_connection));
-			mHandler.post(setEmptyContentRunnable);
+			mActivity.runOnUiThread(threadEmptyContentRunnable);
 			return;
 		}
 		
 		if (res.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			ContextUtil.toast(mActivity, String.format(mActivity.getApplicationContext().getString(R.string.error_http_io), res.getStatusLine().getStatusCode(), res.getStatusLine().toString()));
-			mHandler.post(setEmptyContentRunnable);
+			mActivity.runOnUiThread(threadEmptyContentRunnable);
 			return;
 		} 
 		
@@ -128,13 +150,13 @@ public class SyncThread extends Thread {
 		
 		if (data == null) {
 			ContextUtil.toast(mActivity, "interal error");
-			mHandler.post(setEmptyContentRunnable);
+			mActivity.runOnUiThread(threadEmptyContentRunnable);
 			return;
 		}
 
 		if (result != HttpStatus.SC_OK) {
 			ContextUtil.toast(mActivity, "interal error"); // 처리를 달리해줘야 할 것 같은데..
-			mHandler.post(setEmptyContentRunnable);
+			mActivity.runOnUiThread(threadEmptyContentRunnable);
 			return;
 		}
 
@@ -149,7 +171,7 @@ public class SyncThread extends Thread {
 
 			if (row == null) {
 				ContextUtil.toast(mActivity, "Couldn't find JSONArray[" + i + "]");
-				mHandler.post(setEmptyContentRunnable);
+				mActivity.runOnUiThread(threadEmptyContentRunnable);
 				return;
 			}
 		
@@ -166,7 +188,7 @@ public class SyncThread extends Thread {
 			
 			if (nickname == null || message == null) {
 				ContextUtil.toast(mActivity, "cannot find entity"); // 이것도 바꿔야겟지..
-				mHandler.post(setEmptyContentRunnable);
+				mActivity.runOnUiThread(threadEmptyContentRunnable);
 				return;
 			}
 			
@@ -183,10 +205,9 @@ public class SyncThread extends Thread {
 			int count = mActivity.getContentResolver().bulkInsert(LogSchema.CONTENT_URI, hidden);
 			((SimpleCursorAdapter) mActivity.getListAdapter()).notifyDataSetChanged();
 			Toast.makeText(mActivity, "added " + count + " rows", Toast.LENGTH_SHORT).show();
-			mActivity.setProgressBarIndeterminateVisibility(false);
 		} else {
 			Toast.makeText(mActivity, mActivity.getString(R.string.log_uptodate), Toast.LENGTH_SHORT).show();
-			mHandler.post(setEmptyContentRunnable);
+			mActivity.runOnUiThread(threadEmptyContentRunnable);
 		}
 	}
 }
