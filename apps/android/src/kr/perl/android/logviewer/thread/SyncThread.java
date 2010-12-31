@@ -62,27 +62,8 @@ public class SyncThread extends Thread {
 	private void runUiThread(Runnable thread) {
 		mActivity.runOnUiThread(thread);
 	}
-	
-	@Override
-	public void run() {
-		try {
-			runUiThread(threadLoadingBarStart);
-			//runSync();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			runUiThread(threadLoadingBarStop);
-		} catch (Exception e) {
-			runUiThread(threadLoadingBarStop);
-		}
-	}
-	
-	private void runSync() {
 
-		
+	private void runSync() {
 		HttpResponse res = null;
 		try {
 			res = HttpHelper.query(mUri);
@@ -212,6 +193,17 @@ public class SyncThread extends Thread {
 		} else {
 			Toast.makeText(mActivity, mActivity.getString(R.string.log_uptodate), Toast.LENGTH_SHORT).show();
 			runUiThread(threadEmptyContentRunnable);
+		}
+	}
+	
+	@Override
+	public void run() {
+		try {
+			runUiThread(threadLoadingBarStart);
+			runSync();
+			runUiThread(threadLoadingBarStop);
+		} catch (Exception e) {
+			runUiThread(threadLoadingBarStop);
 		}
 	}
 }
