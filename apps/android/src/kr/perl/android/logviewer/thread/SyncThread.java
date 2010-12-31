@@ -198,7 +198,7 @@ public class SyncThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			runUiThread(threadLoadingBarStart);
+			//runUiThread(threadLoadingBarStart);
 			runSync();
 			runUiThread(threadLoadingBarStop);
 		} catch (Exception e) {
