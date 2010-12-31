@@ -22,7 +22,6 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 public class SyncThread extends Thread {
 	
@@ -72,13 +71,13 @@ public class SyncThread extends Thread {
 		}
 		
 		if (res == null) {
-			ContextUtil.toast(mActivity, mActivity.getApplicationContext().getString(R.string.error_connection));
+			ContextUtil.toastOnUiTread(mActivity, mActivity.getApplicationContext().getString(R.string.error_connection));
 			runUiThread(threadEmptyContentRunnable);
 			return;
 		}
 		
 		if (res.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-			ContextUtil.toast(mActivity, String.format(mActivity.getApplicationContext().getString(R.string.error_http_io), res.getStatusLine().getStatusCode(), res.getStatusLine().toString()));
+			ContextUtil.toastOnUiTread(mActivity, String.format(mActivity.getApplicationContext().getString(R.string.error_http_io), res.getStatusLine().getStatusCode(), res.getStatusLine().toString()));
 			runUiThread(threadEmptyContentRunnable);
 			return;
 		} 
@@ -86,7 +85,7 @@ public class SyncThread extends Thread {
 		JSONObject json = null;
 		HttpEntity entity = res.getEntity();
 		if (entity == null) {
-			ContextUtil.toast(mActivity, "none entity"); 
+			ContextUtil.toastOnUiTread(mActivity, "none entity"); 
 			return;
 		}
 		
@@ -98,13 +97,13 @@ public class SyncThread extends Thread {
 		}
 
 		if (instream == null) {
-			ContextUtil.toast(mActivity, "Couldn't get Entity Content");
+			ContextUtil.toastOnUiTread(mActivity, "Couldn't get Entity Content");
 			return;
 		}
 
 		String response_body = HttpHelper.convertStreamToString(instream);
 		if (response_body == null) {
-			ContextUtil.toast(mActivity, "response body is null");
+			ContextUtil.toastOnUiTread(mActivity, "response body is null");
 			return;
 		}
 		
@@ -115,7 +114,7 @@ public class SyncThread extends Thread {
 		}
 
 		if (json == null) {
-			ContextUtil.toast(mActivity, "Couldn't encode body text to JSON object");
+			ContextUtil.toastOnUiTread(mActivity, "Couldn't encode body text to JSON object");
 			return;
 		}
 
@@ -134,13 +133,13 @@ public class SyncThread extends Thread {
 		}
 		
 		if (data == null) {
-			ContextUtil.toast(mActivity, "interal error");
+			ContextUtil.toastOnUiTread(mActivity, "interal error");
 			runUiThread(threadEmptyContentRunnable);
 			return;
 		}
 
 		if (result != HttpStatus.SC_OK) {
-			ContextUtil.toast(mActivity, "interal error"); // 처리를 달리해줘야 할 것 같은데..
+			ContextUtil.toastOnUiTread(mActivity, "interal error"); // 처리를 달리해줘야 할 것 같은데..
 			runUiThread(threadEmptyContentRunnable);
 			return;
 		}
@@ -155,7 +154,7 @@ public class SyncThread extends Thread {
 			}
 
 			if (row == null) {
-				ContextUtil.toast(mActivity, "Couldn't find JSONArray[" + i + "]");
+				ContextUtil.toastOnUiTread(mActivity, "Couldn't find JSONArray[" + i + "]");
 				runUiThread(threadEmptyContentRunnable);
 				return;
 			}
@@ -172,7 +171,7 @@ public class SyncThread extends Thread {
 			}
 			
 			if (nickname == null || message == null) {
-				ContextUtil.toast(mActivity, "cannot find entity"); // 이것도 바꿔야겟지..
+				ContextUtil.toastOnUiTread(mActivity, "cannot find entity"); // 이것도 바꿔야겟지..
 				runUiThread(threadEmptyContentRunnable);
 				return;
 			}
@@ -189,9 +188,9 @@ public class SyncThread extends Thread {
 			ContentValues[] hidden = values.toArray(new ContentValues[values.size()]);
 			int count = mActivity.getContentResolver().bulkInsert(LogSchema.CONTENT_URI, hidden);
 			((SimpleCursorAdapter) mActivity.getListAdapter()).notifyDataSetChanged();
-			Toast.makeText(mActivity, "added " + count + " rows", Toast.LENGTH_SHORT).show();
+			ContextUtil.toastOnUiTread(mActivity, "added " + count + " rows");
 		} else {
-			Toast.makeText(mActivity, mActivity.getString(R.string.log_uptodate), Toast.LENGTH_SHORT).show();
+			ContextUtil.toastOnUiTread(mActivity, mActivity.getString(R.string.log_uptodate));
 			runUiThread(threadEmptyContentRunnable);
 		}
 	}
