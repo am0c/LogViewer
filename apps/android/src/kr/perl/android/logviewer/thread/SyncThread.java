@@ -20,7 +20,6 @@ import org.json.JSONObject;
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.net.Uri;
-import android.os.Handler;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -67,7 +66,7 @@ public class SyncThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			//runUiThread(threadLoadingBarStart);
+			runUiThread(threadLoadingBarStart);
 			//runSync();
 			try {
 				Thread.sleep(5000);
@@ -75,9 +74,9 @@ public class SyncThread extends Thread {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			//runUiThread(threadLoadingBarStop);
+			runUiThread(threadLoadingBarStop);
 		} catch (Exception e) {
-			//runUiThread(threadLoadingBarStop);
+			runUiThread(threadLoadingBarStop);
 		}
 	}
 	
@@ -93,13 +92,13 @@ public class SyncThread extends Thread {
 		
 		if (res == null) {
 			ContextUtil.toast(mActivity, mActivity.getApplicationContext().getString(R.string.error_connection));
-			//runUiThread(threadEmptyContentRunnable);
+			runUiThread(threadEmptyContentRunnable);
 			return;
 		}
 		
 		if (res.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			ContextUtil.toast(mActivity, String.format(mActivity.getApplicationContext().getString(R.string.error_http_io), res.getStatusLine().getStatusCode(), res.getStatusLine().toString()));
-			//runUiThread(threadEmptyContentRunnable);
+			runUiThread(threadEmptyContentRunnable);
 			return;
 		} 
 		
@@ -155,13 +154,13 @@ public class SyncThread extends Thread {
 		
 		if (data == null) {
 			ContextUtil.toast(mActivity, "interal error");
-			//runUiThread(threadEmptyContentRunnable);
+			runUiThread(threadEmptyContentRunnable);
 			return;
 		}
 
 		if (result != HttpStatus.SC_OK) {
 			ContextUtil.toast(mActivity, "interal error"); // 처리를 달리해줘야 할 것 같은데..
-			//runUiThread(threadEmptyContentRunnable);
+			runUiThread(threadEmptyContentRunnable);
 			return;
 		}
 
@@ -176,7 +175,7 @@ public class SyncThread extends Thread {
 
 			if (row == null) {
 				ContextUtil.toast(mActivity, "Couldn't find JSONArray[" + i + "]");
-				//runUiThread(threadEmptyContentRunnable);
+				runUiThread(threadEmptyContentRunnable);
 				return;
 			}
 		
@@ -193,7 +192,7 @@ public class SyncThread extends Thread {
 			
 			if (nickname == null || message == null) {
 				ContextUtil.toast(mActivity, "cannot find entity"); // 이것도 바꿔야겟지..
-				//runUiThread(threadEmptyContentRunnable);
+				runUiThread(threadEmptyContentRunnable);
 				return;
 			}
 			
@@ -212,7 +211,7 @@ public class SyncThread extends Thread {
 			Toast.makeText(mActivity, "added " + count + " rows", Toast.LENGTH_SHORT).show();
 		} else {
 			Toast.makeText(mActivity, mActivity.getString(R.string.log_uptodate), Toast.LENGTH_SHORT).show();
-			//runUiThread(threadEmptyContentRunnable);
+			runUiThread(threadEmptyContentRunnable);
 		}
 	}
 }
