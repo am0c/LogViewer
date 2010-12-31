@@ -50,8 +50,8 @@ public class ViewerActivity extends ListActivity {
 	}
 	
 	private void sync(final Uri uri, final String channel) {
-		SyncThread thread = new SyncThread(this, uri, channel);
-		thread.run();
+		Thread thread = new SyncThread(this, uri, channel);
+		thread.start();
 	}
 	
 	/*

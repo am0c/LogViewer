@@ -68,7 +68,13 @@ public class SyncThread extends Thread {
 	public void run() {
 		try {
 			//runUiThread(threadLoadingBarStart);
-			runSync();
+			//runSync();
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			//runUiThread(threadLoadingBarStop);
 		} catch (Exception e) {
 			//runUiThread(threadLoadingBarStop);
@@ -76,12 +82,7 @@ public class SyncThread extends Thread {
 	}
 	
 	private void runSync() {
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 		
 		HttpResponse res = null;
 		try {
